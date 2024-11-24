@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R-Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1e1e2f; /* Space grey background */
+            color: #e0e0e0; /* White text */
+        }
+        .container {
+            max-width: 700px;
+            margin-top: 50px;
+            background-color: #2a2a40; /* Darker grey for container */
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #395b64; /* Teal border */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        textarea, input {
+            border: 2px solid #395b64; /* Teal border */
+            background-color: #232332; /* Space grey background */
+            color: #e0e0e0; /* White text */
+        }
+        textarea::placeholder, input::placeholder {
+            color: #c0c0c0; /* Lighter grey for placeholders */
+        }
+        textarea:focus, input:focus {
+            outline: none;
+            box-shadow: 0 0 8px rgba(57, 91, 100, 0.5); /* Teal glow */
+        }
+        #output-container {
+            min-height: 200px;
+            background-color: #232332; /* Space grey background */
+            border: 2px solid #395b64; /* Teal border */
+            padding: 15px;
+            border-radius: 8px;
+            overflow: auto;
+            word-wrap: break-word;
+        }
+        #output-container img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #395b64; /* Teal border */
+            border-radius: 8px;
+        }
+        button {
+            background-color: #d4af37; /* Golden color */
+            border: none;
+            color: #ffffff !important; /* Force white text */
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+        }
+        button:hover {
+            background-color: #ffcc4d; /* Lighter golden hover effect */
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.6);
+        }
+        h1 {
+            color: #d4af37; /* Golden color for the title */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">R-Dashboard</h1>
+        <form id="rForm" method="POST">
+            <!-- User Name Field -->
+            <div class="mb-3">
+                <label for="userName" class="form-label">Your Name</label>
+                <input id="userName" name="userName" type="text" class="form-control" placeholder="Enter your name" required>
+            </div>
+            <!-- R Script Field -->
+            <div class="mb-3">
+                <label for="rScript" class="form-label">Write R Script</label>
+                <textarea id="rScript" name="rScript" class="form-control" rows="5" placeholder="Type your R script here..." required></textarea>
+            </div>
+            <button type="submit" class="btn w-100">Run R Script</button>
+        </form>
+        <hr>
+        <div id="result" class="mt-4">
+            <h5 class="text-center" style="color: #395b64;">Output:</h5>
+            <div id="output-container" class="text-center">
+                <!-- Result content will be dynamically inserted here -->
+                <p class="text-muted">Your result will appear here...</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('rForm').onsubmit = async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            // Show loading message
+            const outputContainer = document.getElementById('output-container');
+            outputContainer.innerHTML = '<p class="text-muted">Processing your script, please wait...</p>';
+
+            try {
+                const response = await fetch('', { method: 'POST', body: formData });
+                const contentType = response.headers.get('Content-Type');
+
+                // Handle different content types
+                if (contentType.startsWith('text/plain')) {
+                    const text = await response.text();
+                    outputContainer.innerHTML = `<pre>${text}</pre>`;
+                } else if (contentType.startsWith('image/png')) {
+                    const blob = await response.blob();
+                    const imageUrl = URL.createObjectURL(blob);
+                    outputContainer.innerHTML = `<img src="${imageUrl}" alt="Generated Plot" />`;
+                } else {
+                    outputContainer.innerHTML = '<p class="text-danger">Unsupported result type.</p>';
+                }
+            } catch (error) {
+                outputContainer.innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+            }
+        };
+    </script>
+</body>
+</html>
