@@ -5,7 +5,7 @@ from .services import handle_r_script_output
 
 def index(request):
     """
-    View for rendering the main dashboard page.
+    Renders the main dashboard page.
     """
     return render(request, 'index.html')
 
@@ -23,8 +23,8 @@ def run_r_script(request):
 
         try:
             # Process the script using a service function
-            result = handle_r_script_output(user_name, r_script)
-            return result  # Returns the HttpResponse or JsonResponse directly
+            response = handle_r_script_output(r_script)
+            return response  # Return the appropriate HttpResponse or JsonResponse
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
