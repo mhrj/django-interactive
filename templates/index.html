@@ -90,33 +90,58 @@
         </div>
     </div>
     <script>
-        document.getElementById('rForm').onsubmit = async function(event) {
+        // document.getElementById('rForm').onsubmit = async function (event) {
+        //     event.preventDefault();
+        //     const formData = new FormData(this);
+        //     const outputContainer = document.getElementById('output-container');
+        //     outputContainer.innerHTML = '<p class="text-muted">Processing your script, please wait...</p>';
+        //     try {
+        //         const response = await fetch('/run-r-script/', { method: 'POST', body: formData });
+                
+        //         if (response.ok) {
+        //             const contentType = response.headers.get('Content-Type');
+
+        //             if (contentType === 'image/png') {  // Handle image response
+        //                 const blob = await response.blob();
+        //                 const imageUrl = URL.createObjectURL(blob);
+        //                 outputContainer.innerHTML = `<img src="${imageUrl}" alt="Generated Plot" />`;
+        //             } else {  // Handle text response
+        //                 const data = await response.json();
+        //                 outputContainer.innerHTML = `<pre>${data.result || 'No output generated'}</pre>`;
+        //             }
+        //         } else {
+        //             const errorData = await response.json();
+        //             outputContainer.innerHTML = `<p class="text-danger">${errorData.error}</p>`;
+        //         }
+        //     } catch (error) {
+        //         outputContainer.innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+        //     }
+        // };
+        document.getElementById('rForm').onsubmit = async function (event) {
             event.preventDefault();
             const formData = new FormData(this);
-
-            // Show loading message
             const outputContainer = document.getElementById('output-container');
             outputContainer.innerHTML = '<p class="text-muted">Processing your script, please wait...</p>';
-
             try {
-                const response = await fetch('', { method: 'POST', body: formData });
-                const contentType = response.headers.get('Content-Type');
-
-                // Handle different content types
-                if (contentType.startsWith('text/plain')) {
-                    const text = await response.text();
-                    outputContainer.innerHTML = `<pre>${text}</pre>`;
-                } else if (contentType.startsWith('image/png')) {
-                    const blob = await response.blob();
-                    const imageUrl = URL.createObjectURL(blob);
-                    outputContainer.innerHTML = `<img src="${imageUrl}" alt="Generated Plot" />`;
+                const response = await fetch('/run-r-script/', { method: 'POST', body: formData });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.result.startsWith("data:image/png;base64,")) {
+                        // Display the plot
+                        outputContainer.innerHTML = `<img src="${data.result}" alt="Generated Plot" />`;
+                    } else {
+                        // Display textual or numeric data
+                        outputContainer.innerHTML = `<pre>${data.result || 'No output generated'}</pre>`;
+                    }
                 } else {
-                    outputContainer.innerHTML = '<p class="text-danger">Unsupported result type.</p>';
+                    const errorData = await response.json();
+                    outputContainer.innerHTML = `<p class="text-danger">${errorData.error}</p>`;
                 }
             } catch (error) {
                 outputContainer.innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
             }
         };
+
     </script>
 </body>
 </html>
