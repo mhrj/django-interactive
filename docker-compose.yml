@@ -1,0 +1,21 @@
+services:
+  django:
+    build:
+      context: .
+      dockerfile: Dockerfile.django
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - rserve
+    environment:
+      R_HOST: rserve
+      R_PORT: 6312
+
+  rserve:
+    build:
+      context: .
+      dockerfile: Dockerfile.r
+    ports:
+      - "6312:6312"

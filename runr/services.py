@@ -20,7 +20,7 @@ def process_r_script(r_script):
     r_script = sanitize_script(r_script)
     conn = None
     try:
-        conn = connect("localhost", 6312)
+        conn = connect("rserve", 6312)
         result = conn.eval(r_script)
 
         # Check if the result is Base64-encoded
