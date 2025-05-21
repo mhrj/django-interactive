@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install R packages
-RUN R -e "install.packages(c('Rserve', 'zoo', 'syuzhet'), repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages(c('Rserve', 'zoo', 'syuzhet','ggplot2','base64enc'), repos='http://cran.rstudio.com/')"
 
 # Expose Rserve port
 EXPOSE 6312
